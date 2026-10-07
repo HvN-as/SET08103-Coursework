@@ -176,7 +176,7 @@ The report displays:
 3. The user selects World, Continent, Region, Country, District or City.
 4. If required, the user selects the specific geographical area.
 5. The system retrieves the population data from the World database.
-6. The system displays the population total.
+6. 6. The system displays the population total and clearly identifies the geographical level being reported.
 7. The user views the result.
 
 ### Report Information
@@ -193,7 +193,7 @@ The system can display the population of:
 - If population data cannot be retrieved, the system informs the user that the report cannot be generated.
 
 ### Postconditions
-- The requested population total is displayed.
+- The requested population total and its geographical level are displayed.
 - No database data is modified.
 
 ---
