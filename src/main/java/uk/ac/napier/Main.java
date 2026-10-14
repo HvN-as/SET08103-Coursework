@@ -164,6 +164,39 @@ public class Main {
                     }
                 }
             }
+            // REPORT 6: Top N countries in a selected region by population
+            String topRegionSql = """
+        SELECT country.Code, country.Name, country.Continent,
+               country.Region, country.Population, city.Name AS Capital
+        FROM country
+        LEFT JOIN city ON country.Capital = city.ID
+        WHERE country.Region = ?
+        ORDER BY country.Population DESC
+        LIMIT ?
+        """;
+
+            String topRegion = "Eastern Africa";
+            int topRegionN = 10;
+
+            System.out.println("\nREPORT 6: Top " + topRegionN
+                    + " countries in " + topRegion + " by population");
+
+            try (PreparedStatement topRegionStatement =
+                         connection.prepareStatement(topRegionSql)) {
+
+                topRegionStatement.setString(1, topRegion);
+                topRegionStatement.setInt(2, topRegionN);
+
+                try (ResultSet topRegionResults =
+                             topRegionStatement.executeQuery()) {
+
+                    printCountryHeader();
+
+                    while (topRegionResults.next()) {
+                        printCountryRow(topRegionResults);
+                    }
+                }
+            }
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
         }
