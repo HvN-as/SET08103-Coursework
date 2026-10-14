@@ -1,3 +1,4 @@
+
 package uk.ac.napier;
 
 import java.sql.Connection;
@@ -7,8 +8,31 @@ import java.sql.SQLException;
 
 public class CityReport {
 
-    public static void showAllCities(Connection connection)
-            throws SQLException {
+    // Displays the required city report columns and rows.
+    private static void printResults(ResultSet results) throws SQLException {
+        System.out.printf("%-35s %-35s %-30s %-15s%n",
+                "Name", "Country", "District", "Population");
+
+        while (results.next()) {
+            System.out.printf("%-35s %-35s %-30s %-15d%n",
+                    results.getString("Name"),
+                    results.getString("Country"),
+                    results.getString("District"),
+                    results.getLong("Population"));
+        }
+    }
+
+    // Runs a city report with optional geographical filtering and Top N.
+    private static void runReport(
+            Connection connection,
+            String filterColumn,
+            String filterValue,
+            Integer limit) throws SQLException {
+
+        if (limit != null && limit <= 0) {
+            throw new IllegalArgumentException(
+                    "N must be greater than zero.");
+        }
 
         String sql = """
                 SELECT city.Name,
@@ -17,372 +41,103 @@ public class CityReport {
                        city.Population
                 FROM city
                 JOIN country ON city.CountryCode = country.Code
-                ORDER BY city.Population DESC
                 """;
 
+        if (filterColumn != null) {
+            sql += " WHERE " + filterColumn + " = ?";
+        }
+
+        sql += " ORDER BY city.Population DESC";
+
+        if (limit != null) {
+            sql += " LIMIT ?";
+        }
+
         try (PreparedStatement statement =
-                     connection.prepareStatement(sql);
-             ResultSet results = statement.executeQuery()) {
+                     connection.prepareStatement(sql)) {
 
-            System.out.printf("%-35s %-35s %-30s %-15s%n",
-                    "Name", "Country", "District", "Population");
+            int parameterIndex = 1;
 
-            while (results.next()) {
-                System.out.printf("%-35s %-35s %-30s %-15d%n",
-                        results.getString("Name"),
-                        results.getString("Country"),
-                        results.getString("District"),
-                        results.getLong("Population"));
+            if (filterColumn != null) {
+                statement.setString(parameterIndex++, filterValue);
+            }
+
+            if (limit != null) {
+                statement.setInt(parameterIndex, limit);
+            }
+
+            try (ResultSet results = statement.executeQuery()) {
+                printResults(results);
             }
         }
     }
 
+    // 1. All cities in the world.
+    public static void showAllCities(Connection connection)
+            throws SQLException {
+        runReport(connection, null, null, null);
+    }
+
+    // 2. All cities in a continent.
     public static void showCitiesByContinent(
-        Connection connection, String continent)
-        throws SQLException {
-
-    String sql = """
-            SELECT city.Name,
-                   country.Name AS Country,
-                   city.District,
-                   city.Population
-            FROM city
-            JOIN country ON city.CountryCode = country.Code
-            WHERE country.Continent = ?
-            ORDER BY city.Population DESC
-            """;
-
-    try (PreparedStatement statement =
-                 connection.prepareStatement(sql)) {
-
-        statement.setString(1, continent);
-
-        try (ResultSet results = statement.executeQuery()) {
-
-            System.out.printf("%-35s %-35s %-30s %-15s%n",
-                    "Name", "Country", "District", "Population");
-
-            while (results.next()) {
-                System.out.printf("%-35s %-35s %-30s %-15d%n",
-                        results.getString("Name"),
-                        results.getString("Country"),
-                        results.getString("District"),
-                        results.getLong("Population"));
-            }
-        }
+            Connection connection, String continent)
+            throws SQLException {
+        runReport(connection, "country.Continent", continent, null);
     }
+
+    // 3. All cities in a region.
     public static void showCitiesByRegion(
-        Connection connection, String region)
-        throws SQLException {
-
-    String sql = """
-            SELECT city.Name,
-                   country.Name AS Country,
-                   city.District,
-                   city.Population
-            FROM city
-            JOIN country ON city.CountryCode = country.Code
-            WHERE country.Region = ?
-            ORDER BY city.Population DESC
-            """;
-
-    try (PreparedStatement statement =
-                 connection.prepareStatement(sql)) {
-
-        statement.setString(1, region);
-
-        try (ResultSet results = statement.executeQuery()) {
-
-            System.out.printf("%-35s %-35s %-30s %-15s%n",
-                    "Name", "Country", "District", "Population");
-
-            while (results.next()) {
-                System.out.printf("%-35s %-35s %-30s %-15d%n",
-                        results.getString("Name"),
-                        results.getString("Country"),
-                        results.getString("District"),
-                        results.getLong("Population"));
-            }
-        }
+            Connection connection, String region)
+            throws SQLException {
+        runReport(connection, "country.Region", region, null);
     }
 
+    // 4. All cities in a country.
     public static void showCitiesByCountry(
-        Connection connection, String country)
-        throws SQLException {
-
-    String sql = """
-            SELECT city.Name,
-                   country.Name AS Country,
-                   city.District,
-                   city.Population
-            FROM city
-            JOIN country ON city.CountryCode = country.Code
-            WHERE country.Name = ?
-            ORDER BY city.Population DESC
-            """;
-
-    try (PreparedStatement statement =
-                 connection.prepareStatement(sql)) {
-
-        statement.setString(1, country);
-
-        try (ResultSet results = statement.executeQuery()) {
-
-            System.out.printf("%-35s %-35s %-30s %-15s%n",
-                    "Name", "Country", "District", "Population");
-
-            while (results.next()) {
-                System.out.printf("%-35s %-35s %-30s %-15d%n",
-                        results.getString("Name"),
-                        results.getString("Country"),
-                        results.getString("District"),
-                        results.getLong("Population"));
-            }
-        }
+            Connection connection, String country)
+            throws SQLException {
+        runReport(connection, "country.Name", country, null);
     }
 
+    // 5. All cities in a district.
     public static void showCitiesByDistrict(
-        Connection connection, String district)
-        throws SQLException {
-
-    String sql = """
-            SELECT city.Name,
-                   country.Name AS Country,
-                   city.District,
-                   city.Population
-            FROM city
-            JOIN country ON city.CountryCode = country.Code
-            WHERE city.District = ?
-            ORDER BY city.Population DESC
-            """;
-
-    try (PreparedStatement statement =
-                 connection.prepareStatement(sql)) {
-
-        statement.setString(1, district);
-
-        try (ResultSet results = statement.executeQuery()) {
-
-            System.out.printf("%-35s %-35s %-30s %-15s%n",
-                    "Name", "Country", "District", "Population");
-
-            while (results.next()) {
-                System.out.printf("%-35s %-35s %-30s %-15d%n",
-                        results.getString("Name"),
-                        results.getString("Country"),
-                        results.getString("District"),
-                        results.getLong("Population"));
-            }
-        }
+            Connection connection, String district)
+            throws SQLException {
+        runReport(connection, "city.District", district, null);
     }
 
+    // 6. Top N cities in the world.
     public static void showTopNCitiesWorldwide(
-        Connection connection, int n)
-        throws SQLException {
-
-    if (n <= 0) {
-        throw new IllegalArgumentException(
-                "N must be greater than zero.");
+            Connection connection, int n)
+            throws SQLException {
+        runReport(connection, null, null, n);
     }
 
-    String sql = """
-            SELECT city.Name,
-                   country.Name AS Country,
-                   city.District,
-                   city.Population
-            FROM city
-            JOIN country ON city.CountryCode = country.Code
-            ORDER BY city.Population DESC
-            LIMIT ?
-            """;
-
-    try (PreparedStatement statement =
-                 connection.prepareStatement(sql)) {
-
-        statement.setInt(1, n);
-
-        try (ResultSet results = statement.executeQuery()) {
-
-            System.out.printf("%-35s %-35s %-30s %-15s%n",
-                    "Name", "Country", "District", "Population");
-
-            while (results.next()) {
-                System.out.printf("%-35s %-35s %-30s %-15d%n",
-                        results.getString("Name"),
-                        results.getString("Country"),
-                        results.getString("District"),
-                        results.getLong("Population"));
-            }
-        }
-    }
-
+    // 7. Top N cities in a continent.
     public static void showTopNCitiesByContinent(
-        Connection connection, String continent, int n)
-        throws SQLException {
-
-    if (n <= 0) {
-        throw new IllegalArgumentException(
-                "N must be greater than zero.");
+            Connection connection, String continent, int n)
+            throws SQLException {
+        runReport(connection, "country.Continent", continent, n);
     }
 
-    String sql = """
-            SELECT city.Name,
-                   country.Name AS Country,
-                   city.District,
-                   city.Population
-            FROM city
-            JOIN country ON city.CountryCode = country.Code
-            WHERE country.Continent = ?
-            ORDER BY city.Population DESC
-            LIMIT ?
-            """;
-
-    try (PreparedStatement statement =
-                 connection.prepareStatement(sql)) {
-
-        statement.setString(1, continent);
-        statement.setInt(2, n);
-
-        try (ResultSet results = statement.executeQuery()) {
-
-            System.out.printf("%-35s %-35s %-30s %-15s%n",
-                    "Name", "Country", "District", "Population");
-
-            while (results.next()) {
-                System.out.printf("%-35s %-35s %-30s %-15d%n",
-                        results.getString("Name"),
-                        results.getString("Country"),
-                        results.getString("District"),
-                        results.getLong("Population"));
-            }
-        }
-    }
-
+    // 8. Top N cities in a region.
     public static void showTopNCitiesByRegion(
-        Connection connection, String region, int n)
-        throws SQLException {
-
-    if (n <= 0) {
-        throw new IllegalArgumentException(
-                "N must be greater than zero.");
+            Connection connection, String region, int n)
+            throws SQLException {
+        runReport(connection, "country.Region", region, n);
     }
 
-    String sql = """
-            SELECT city.Name,
-                   country.Name AS Country,
-                   city.District,
-                   city.Population
-            FROM city
-            JOIN country ON city.CountryCode = country.Code
-            WHERE country.Region = ?
-            ORDER BY city.Population DESC
-            LIMIT ?
-            """;
-
-    try (PreparedStatement statement =
-                 connection.prepareStatement(sql)) {
-
-        statement.setString(1, region);
-        statement.setInt(2, n);
-
-        try (ResultSet results = statement.executeQuery()) {
-
-            System.out.printf("%-35s %-35s %-30s %-15s%n",
-                    "Name", "Country", "District", "Population");
-
-            while (results.next()) {
-                System.out.printf("%-35s %-35s %-30s %-15d%n",
-                        results.getString("Name"),
-                        results.getString("Country"),
-                        results.getString("District"),
-                        results.getLong("Population"));
-            }
-        }
-    }
+    // 9. Top N cities in a country.
     public static void showTopNCitiesByCountry(
-        Connection connection, String country, int n)
-        throws SQLException {
-
-    if (n <= 0) {
-        throw new IllegalArgumentException(
-                "N must be greater than zero.");
+            Connection connection, String country, int n)
+            throws SQLException {
+        runReport(connection, "country.Name", country, n);
     }
 
-    String sql = """
-            SELECT city.Name,
-                   country.Name AS Country,
-                   city.District,
-                   city.Population
-            FROM city
-            JOIN country ON city.CountryCode = country.Code
-            WHERE country.Name = ?
-            ORDER BY city.Population DESC
-            LIMIT ?
-            """;
-
-    try (PreparedStatement statement =
-                 connection.prepareStatement(sql)) {
-
-        statement.setString(1, country);
-        statement.setInt(2, n);
-
-        try (ResultSet results = statement.executeQuery()) {
-
-            System.out.printf("%-35s %-35s %-30s %-15s%n",
-                    "Name", "Country", "District", "Population");
-
-            while (results.next()) {
-                System.out.printf("%-35s %-35s %-30s %-15d%n",
-                        results.getString("Name"),
-                        results.getString("Country"),
-                        results.getString("District"),
-                        results.getLong("Population"));
-            }
-        }
-    }
-}
-
+    // 10. Top N cities in a district.
     public static void showTopNCitiesByDistrict(
-        Connection connection, String district, int n)
-        throws SQLException {
-
-    if (n <= 0) {
-        throw new IllegalArgumentException(
-                "N must be greater than zero.");
+            Connection connection, String district, int n)
+            throws SQLException {
+        runReport(connection, "city.District", district, n);
     }
-
-    String sql = """
-            SELECT city.Name,
-                   country.Name AS Country,
-                   city.District,
-                   city.Population
-            FROM city
-            JOIN country ON city.CountryCode = country.Code
-            WHERE city.District = ?
-            ORDER BY city.Population DESC
-            LIMIT ?
-            """;
-
-    try (PreparedStatement statement =
-                 connection.prepareStatement(sql)) {
-
-        statement.setString(1, district);
-        statement.setInt(2, n);
-
-        try (ResultSet results = statement.executeQuery()) {
-
-            System.out.printf("%-35s %-35s %-30s %-15s%n",
-                    "Name", "Country", "District", "Population");
-
-            while (results.next()) {
-                System.out.printf("%-35s %-35s %-30s %-15d%n",
-                        results.getString("Name"),
-                        results.getString("Country"),
-                        results.getString("District"),
-                        results.getLong("Population"));
-            }
-        }
-    }
-}
-    
 }
