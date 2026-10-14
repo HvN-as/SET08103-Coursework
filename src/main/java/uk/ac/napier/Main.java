@@ -1,4 +1,3 @@
-
 package uk.ac.napier;
 
 import java.sql.Connection;
@@ -21,19 +20,14 @@ public class Main {
             return;
         }
 
-        try (Connection connection =
-                     DriverManager.getConnection(url, username, password)) {
+        try (Connection connection = DriverManager.getConnection(url, username, password)) {
 
             System.out.println("Successfully connected to the World database!");
 
             // REPORT 1: All countries in the world by population
             String sql = """
-                    SELECT country.Code,
-                           country.Name,
-                           country.Continent,
-                           country.Region,
-                           country.Population,
-                           city.Name AS Capital
+                    SELECT country.Code, country.Name, country.Continent,
+                           country.Region, country.Population, city.Name AS Capital
                     FROM country
                     LEFT JOIN city ON country.Capital = city.ID
                     ORDER BY country.Population DESC
@@ -53,12 +47,8 @@ public class Main {
 
             // REPORT 2: All countries in a selected continent by population
             String continentSql = """
-                    SELECT country.Code,
-                           country.Name,
-                           country.Continent,
-                           country.Region,
-                           country.Population,
-                           city.Name AS Capital
+                    SELECT country.Code, country.Name, country.Continent,
+                           country.Region, country.Population, city.Name AS Capital
                     FROM country
                     LEFT JOIN city ON country.Capital = city.ID
                     WHERE country.Continent = ?
@@ -67,17 +57,13 @@ public class Main {
 
             String selectedContinent = "Africa";
 
-            System.out.println(
-                    "\nREPORT 2: Countries in " + selectedContinent + " by population"
-            );
+            System.out.println("\nREPORT 2: Countries in " + selectedContinent + " by population");
 
-            try (PreparedStatement continentStatement =
-                         connection.prepareStatement(continentSql)) {
+            try (PreparedStatement continentStatement = connection.prepareStatement(continentSql)) {
 
                 continentStatement.setString(1, selectedContinent);
 
-                try (ResultSet continentResults =
-                             continentStatement.executeQuery()) {
+                try (ResultSet continentResults = continentStatement.executeQuery()) {
 
                     printCountryHeader();
 
@@ -87,20 +73,47 @@ public class Main {
                 }
             }
 
+            // REPORT 3: All countries in a selected region by population
+            String regionSql = """
+                    SELECT country.Code, country.Name, country.Continent,
+                           country.Region, country.Population, city.Name AS Capital
+                    FROM country
+                    LEFT JOIN city ON country.Capital = city.ID
+                    WHERE country.Region = ?
+                    ORDER BY country.Population DESC
+                    """;
+
+            String selectedRegion = "Eastern Africa";
+
+            System.out.println("\nREPORT 3: Countries in " + selectedRegion + " by population");
+
+            try (PreparedStatement regionStatement = connection.prepareStatement(regionSql)) {
+
+                regionStatement.setString(1, selectedRegion);
+
+                try (ResultSet regionResults = regionStatement.executeQuery()) {
+
+                    printCountryHeader();
+
+                    while (regionResults.next()) {
+                        printCountryRow(regionResults);
+                    }
+                }
+            }
+
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
         }
     }
 
-    // Prints the six required column headings
+    // Print the country report column headings
     private static void printCountryHeader() {
-        System.out.printf(
-                "%-5s %-35s %-15s %-30s %-15s %-30s%n",
-                "Code", "Name", "Continent", "Region", "Population", "Capital"
-        );
+
+        System.out.printf("%-5s %-35s %-15s %-30s %-15s %-30s%n",
+                "Code", "Name", "Continent", "Region", "Population", "Capital");
     }
 
-    // Prints one country with all six required columns
+    // Print each country's details
     private static void printCountryRow(ResultSet results) throws SQLException {
 
         String capital = results.getString("Capital");
@@ -109,14 +122,12 @@ public class Main {
             capital = "N/A";
         }
 
-        System.out.printf(
-                "%-5s %-35s %-15s %-30s %-15d %-30s%n",
+        System.out.printf("%-5s %-35s %-15s %-30s %-15d %-30s%n",
                 results.getString("Code"),
                 results.getString("Name"),
                 results.getString("Continent"),
                 results.getString("Region"),
                 results.getLong("Population"),
-                capital
-        );
+                capital);
     }
 }
