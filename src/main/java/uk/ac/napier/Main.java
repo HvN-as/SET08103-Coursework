@@ -101,6 +101,35 @@ public class Main {
                 }
             }
 
+            // REPORT 4: Top N countries in the world by population
+            String topCountriesSql = """
+        SELECT country.Code, country.Name, country.Continent,
+               country.Region, country.Population, city.Name AS Capital
+        FROM country
+        LEFT JOIN city ON country.Capital = city.ID
+        ORDER BY country.Population DESC
+        LIMIT ?
+        """;
+
+            int topN = 10;
+
+            System.out.println("\nREPORT 4: Top " + topN + " countries in the world by population");
+
+            try (PreparedStatement topCountriesStatement =
+                         connection.prepareStatement(topCountriesSql)) {
+
+                topCountriesStatement.setInt(1, topN);
+
+                try (ResultSet topCountriesResults =
+                             topCountriesStatement.executeQuery()) {
+
+                    printCountryHeader();
+
+                    while (topCountriesResults.next()) {
+                        printCountryRow(topCountriesResults);
+                    }
+                }
+            }
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
         }
