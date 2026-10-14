@@ -130,6 +130,40 @@ public class Main {
                     }
                 }
             }
+
+            // REPORT 5: Top N countries in a selected continent by population
+            String topContinentSql = """
+        SELECT country.Code, country.Name, country.Continent,
+               country.Region, country.Population, city.Name AS Capital
+        FROM country
+        LEFT JOIN city ON country.Capital = city.ID
+        WHERE country.Continent = ?
+        ORDER BY country.Population DESC
+        LIMIT ?
+        """;
+
+            String topContinent = "Africa";
+            int topContinentN = 10;
+
+            System.out.println("\nREPORT 5: Top " + topContinentN
+                    + " countries in " + topContinent + " by population");
+
+            try (PreparedStatement topContinentStatement =
+                         connection.prepareStatement(topContinentSql)) {
+
+                topContinentStatement.setString(1, topContinent);
+                topContinentStatement.setInt(2, topContinentN);
+
+                try (ResultSet topContinentResults =
+                             topContinentStatement.executeQuery()) {
+
+                    printCountryHeader();
+
+                    while (topContinentResults.next()) {
+                        printCountryRow(topContinentResults);
+                    }
+                }
+            }
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
         }
