@@ -107,5 +107,41 @@ public class CityReport {
         }
     }
 }
+
+    public static void showCitiesByCountry(
+        Connection connection, String country)
+        throws SQLException {
+
+    String sql = """
+            SELECT city.Name,
+                   country.Name AS Country,
+                   city.District,
+                   city.Population
+            FROM city
+            JOIN country ON city.CountryCode = country.Code
+            WHERE country.Name = ?
+            ORDER BY city.Population DESC
+            """;
+
+    try (PreparedStatement statement =
+                 connection.prepareStatement(sql)) {
+
+        statement.setString(1, country);
+
+        try (ResultSet results = statement.executeQuery()) {
+
+            System.out.printf("%-35s %-35s %-30s %-15s%n",
+                    "Name", "Country", "District", "Population");
+
+            while (results.next()) {
+                System.out.printf("%-35s %-35s %-30s %-15d%n",
+                        results.getString("Name"),
+                        results.getString("Country"),
+                        results.getString("District"),
+                        results.getLong("Population"));
+            }
+        }
+    }
+}
     
 }
