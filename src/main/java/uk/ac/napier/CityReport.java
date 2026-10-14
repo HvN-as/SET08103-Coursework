@@ -71,7 +71,6 @@ public class CityReport {
             }
         }
     }
-}
     public static void showCitiesByRegion(
         Connection connection, String region)
         throws SQLException {
@@ -106,7 +105,6 @@ public class CityReport {
             }
         }
     }
-}
 
     public static void showCitiesByCountry(
         Connection connection, String country)
@@ -142,7 +140,6 @@ public class CityReport {
             }
         }
     }
-}
 
     public static void showCitiesByDistrict(
         Connection connection, String district)
@@ -178,7 +175,6 @@ public class CityReport {
             }
         }
     }
-}
 
     public static void showTopNCitiesWorldwide(
         Connection connection, int n)
@@ -219,7 +215,6 @@ public class CityReport {
             }
         }
     }
-}
 
     public static void showTopNCitiesByContinent(
         Connection connection, String continent, int n)
@@ -262,7 +257,6 @@ public class CityReport {
             }
         }
     }
-}
 
     public static void showTopNCitiesByRegion(
         Connection connection, String region, int n)
@@ -305,7 +299,6 @@ public class CityReport {
             }
         }
     }
-}
     public static void showTopNCitiesByCountry(
         Connection connection, String country, int n)
         throws SQLException {
