@@ -153,6 +153,52 @@ public class CapitalCityReports {
         }
     }
 
+    // Report 5: Top N capital cities in a continent
+    public void topCapitalsByContinent(String continent, int topN)
+            throws SQLException {
+
+        if (continent == null || continent.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Continent cannot be blank.");
+        }
+
+        if (topN <= 0) {
+            throw new IllegalArgumentException(
+                    "Top N must be greater than zero.");
+        }
+
+        String sql = """
+                SELECT city.Name AS Capital,
+                       country.Name AS Country,
+                       city.Population AS Population
+                FROM country
+                JOIN city ON country.Capital = city.ID
+                WHERE country.Continent = ?
+                ORDER BY city.Population DESC
+                LIMIT ?
+                """;
+
+        try (PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
+
+            statement.setString(1, continent);
+            statement.setInt(2, topN);
+
+            try (ResultSet results = statement.executeQuery()) {
+
+                System.out.println(
+                        "\nTop " + topN +
+                        " capital cities in " + continent);
+
+                printHeader();
+
+                while (results.next()) {
+                    printRow(results);
+                }
+            }
+        }
+    }
+
     private void printHeader() {
         System.out.printf("%-35s %-35s %-15s%n",
                 "Capital", "Country", "Population");
