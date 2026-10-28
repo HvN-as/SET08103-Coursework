@@ -76,6 +76,44 @@ public class CapitalCityReports {
         }
     }
 
+    // Report 3: All capital cities in a selected region
+    public void capitalsByRegion(String region)
+            throws SQLException {
+
+        if (region == null || region.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Region cannot be blank.");
+        }
+
+        String sql = """
+                SELECT city.Name AS Capital,
+                       country.Name AS Country,
+                       city.Population AS Population
+                FROM country
+                JOIN city ON country.Capital = city.ID
+                WHERE country.Region = ?
+                ORDER BY city.Population DESC
+                """;
+
+        try (PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
+
+            statement.setString(1, region);
+
+            try (ResultSet results = statement.executeQuery()) {
+
+                System.out.println(
+                        "\nCapital cities in region: " + region);
+
+                printHeader();
+
+                while (results.next()) {
+                    printRow(results);
+                }
+            }
+        }
+    }
+
     private void printHeader() {
         System.out.printf("%-35s %-35s %-15s%n",
                 "Capital", "Country", "Population");
