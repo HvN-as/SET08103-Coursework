@@ -114,6 +114,45 @@ public class CapitalCityReports {
         }
     }
 
+    // Report 4: Top N capital cities worldwide
+    public void topCapitalsWorldwide(int topN)
+            throws SQLException {
+
+        if (topN <= 0) {
+            throw new IllegalArgumentException(
+                    "Top N must be greater than zero.");
+        }
+
+        String sql = """
+                SELECT city.Name AS Capital,
+                       country.Name AS Country,
+                       city.Population AS Population
+                FROM country
+                JOIN city ON country.Capital = city.ID
+                ORDER BY city.Population DESC
+                LIMIT ?
+                """;
+
+        try (PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
+
+            statement.setInt(1, topN);
+
+            try (ResultSet results = statement.executeQuery()) {
+
+                System.out.println(
+                        "\nTop " + topN +
+                        " capital cities worldwide");
+
+                printHeader();
+
+                while (results.next()) {
+                    printRow(results);
+                }
+            }
+        }
+    }
+
     private void printHeader() {
         System.out.printf("%-35s %-35s %-15s%n",
                 "Capital", "Country", "Population");
