@@ -24,6 +24,16 @@ public class Main {
 
             System.out.println("Successfully connected to the World database!");
 
+            CapitalCityReports capitalReports = new CapitalCityReports(connection);
+
+ConsoleMenu menu = new ConsoleMenu(
+        capitalReports,
+        System.in,
+        System.out
+);
+
+menu.run();
+
             // REPORT 1: All countries in the world by population
             String sql = """
                     SELECT country.Code, country.Name, country.Continent,
