@@ -56,6 +56,13 @@ public class ConsoleMenu {
             output.println("15. Top cities by country");
             output.println("16. Top cities by district");
 
+            output.println("\n--- Population Total Reports ---");
+            output.println("17. World population");
+            output.println("18. Population of a continent");
+            output.println("19. Population of a region");
+            output.println("20. Population of a country");
+            output.println("21. Population of a district");
+            output.println("22. Population of a city");
             output.println("\n0. Exit");
             output.print("Select an option: ");
 
@@ -166,6 +173,61 @@ public class ConsoleMenu {
                                 readRequiredText("Enter district: "),
                                 readPositiveNumber());
                     }
+
+
+                    case "17" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        output.println("World population: " +
+                                reports.worldPopulation());
+                    }
+
+                    case "18" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        String continent = readRequiredText("Enter continent: ");
+                        output.println("Population of " + continent + ": " +
+                                reports.continentPopulation(continent));
+                    }
+
+                    case "19" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        String region = readRequiredText("Enter region: ");
+                        output.println("Population of " + region + ": " +
+                                reports.regionPopulation(region));
+                    }
+
+                    case "20" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        String country = readRequiredText("Enter country: ");
+                        output.println("Population of " + country + ": " +
+                                reports.countryPopulation(country));
+                    }
+
+                    case "21" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        String district = readRequiredText("Enter district: ");
+                        output.println("Population of " + district + ": " +
+                                reports.districtPopulation(district));
+                    }
+
+                    case "22" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        String city = readRequiredText("Enter city: ");
+                        output.println("Population of " + city + ": " +
+                                reports.cityPopulation(city));
+                    }
+
 
                     default -> output.println(
                             "Invalid menu option. Please try again.");
