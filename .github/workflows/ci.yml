@@ -32,6 +32,7 @@ jobs:
       TEST_DB_URL: jdbc:mysql://127.0.0.1:3306/city_report_test
       TEST_DB_USER: root
       TEST_DB_PASSWORD: rootpassword
+      RUN_DB_INTEGRATION_TESTS: 'true'
 
     steps:
       - name: Checkout repository
