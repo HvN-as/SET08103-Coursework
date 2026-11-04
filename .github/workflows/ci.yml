@@ -1,4 +1,5 @@
-﻿name: CI
+﻿
+name: CI
 
 on:
   push:
@@ -28,6 +29,9 @@ jobs:
       DB_URL: jdbc:mysql://127.0.0.1:3306/world
       DB_USER: appuser
       DB_PASSWORD: testpassword
+      TEST_DB_URL: jdbc:mysql://127.0.0.1:3306/city_report_test
+      TEST_DB_USER: root
+      TEST_DB_PASSWORD: rootpassword
 
     steps:
       - name: Checkout repository
@@ -46,6 +50,12 @@ jobs:
         run: |
           mysql --host=127.0.0.1 --port=3306 --user=appuser world < database/world.sql
           mysql --host=127.0.0.1 --port=3306 --user=appuser world -e "SELECT COUNT(*) FROM country;"
+
+      - name: Import CityReport test database
+        env:
+          MYSQL_PWD: rootpassword
+        run: |
+          mysql --host=127.0.0.1 --port=3306 --user=root < src/test/resources/city-report-test-data.sql
 
       - name: Run unit and integration tests
         run: mvn --batch-mode clean verify
