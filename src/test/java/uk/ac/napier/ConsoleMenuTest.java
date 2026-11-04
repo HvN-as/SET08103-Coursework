@@ -145,7 +145,7 @@ class ConsoleMenuTest {
         String result = runMenu("4\n-5\n0\n");
 
         assertTrue(result.contains(
-                "Top N must be greater than zero"));
+                "Number must be greater than zero"));
 
         verifyNoInteractions(capitalReports);
     }
@@ -155,7 +155,7 @@ class ConsoleMenuTest {
         String result = runMenu("4\n0\n0\n");
 
         assertTrue(result.contains(
-                "Top N must be greater than zero"));
+                "Number must be greater than zero"));
 
         verifyNoInteractions(capitalReports);
     }
