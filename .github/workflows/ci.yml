@@ -7,7 +7,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: coursework123
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pcoursework123"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -18,9 +29,17 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
-
+      - name: Import test database
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -p"${{ env.CI_DB_PASSWORD }}" < src/test/resources/city-report-test-data.sql
+        env:
+          CI_DB_PASSWORD: coursework123
       - name: Build Maven JAR
         run: mvn --batch-mode clean package
+        env:
+          TEST_DB_URL: jdbc:mysql://127.0.0.1:3306/city_report_test
+          TEST_DB_USER: root
+          TEST_DB_PASSWORD: coursework123
 
       - name: Build Docker image
         run: docker build -t set08103-coursework:ci .
