@@ -63,6 +63,9 @@ public class ConsoleMenu {
             output.println("20. Population of a country");
             output.println("21. Population of a district");
             output.println("22. Population of a city");
+
+            output.println("\n--- Language Population Reports ---");
+            output.println("23. Major language population report");
             output.println("\n0. Exit");
             output.print("Select an option: ");
 
@@ -226,6 +229,13 @@ public class ConsoleMenu {
                         String city = readRequiredText("Enter city: ");
                         output.println("Population of " + city + ": " +
                                 reports.cityPopulation(city));
+                    }
+
+                    case "23" -> {
+                        requireCityConnection();
+                        LanguagePopulationReports reports =
+                                new LanguagePopulationReports(connection);
+                        reports.showLanguageReport(output);
                     }
 
 
