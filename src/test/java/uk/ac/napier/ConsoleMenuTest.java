@@ -3,11 +3,13 @@ package uk.ac.napier;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -23,22 +25,60 @@ class ConsoleMenuTest {
         output = new ByteArrayOutputStream();
     }
 
+    // Original helper for capital city reports
     private String runMenu(String input) throws Exception {
+
         ByteArrayInputStream testInput =
                 new ByteArrayInputStream(
                         input.getBytes(StandardCharsets.UTF_8));
 
         PrintStream testOutput =
-                new PrintStream(output, true,
+                new PrintStream(
+                        output,
+                        true,
                         StandardCharsets.UTF_8);
 
         ConsoleMenu menu = new ConsoleMenu(
-                capitalReports, testInput, testOutput);
+                capitalReports,
+                testInput,
+                testOutput
+        );
 
         menu.run();
 
         return output.toString(StandardCharsets.UTF_8);
     }
+
+    // New helper for city population reports
+    private String runCityMenu(
+            String input,
+            Connection connection) throws Exception {
+
+        ByteArrayInputStream testInput =
+                new ByteArrayInputStream(
+                        input.getBytes(StandardCharsets.UTF_8));
+
+        PrintStream testOutput =
+                new PrintStream(
+                        output,
+                        true,
+                        StandardCharsets.UTF_8);
+
+        ConsoleMenu menu = new ConsoleMenu(
+                capitalReports,
+                connection,
+                testInput,
+                testOutput
+        );
+
+        menu.run();
+
+        return output.toString(StandardCharsets.UTF_8);
+    }
+
+    // ==========================================
+    // ORIGINAL CAPITAL CITY TESTS
+    // ==========================================
 
     @Test
     void testExitOption() throws Exception {
@@ -156,5 +196,158 @@ class ConsoleMenuTest {
                 "Input closed. Exiting."));
 
         verifyNoInteractions(capitalReports);
+    }
+
+    // ==========================================
+    // NEW CITY POPULATION REPORT TESTS
+    // ==========================================
+
+    @Test
+    void testAllCitiesWorldwide() throws Exception {
+        Connection connection = mock(Connection.class);
+
+        try (MockedStatic<CityReport> cityReports =
+                     mockStatic(CityReport.class)) {
+
+            runCityMenu("7\n0\n", connection);
+
+            cityReports.verify(
+                    () -> CityReport.showAllCities(connection));
+        }
+    }
+
+    @Test
+    void testCitiesByContinent() throws Exception {
+        Connection connection = mock(Connection.class);
+
+        try (MockedStatic<CityReport> cityReports =
+                     mockStatic(CityReport.class)) {
+
+            runCityMenu("8\nAfrica\n0\n", connection);
+
+            cityReports.verify(
+                    () -> CityReport.showCitiesByContinent(
+                            connection, "Africa"));
+        }
+    }
+
+    @Test
+    void testCitiesByRegion() throws Exception {
+        Connection connection = mock(Connection.class);
+
+        try (MockedStatic<CityReport> cityReports =
+                     mockStatic(CityReport.class)) {
+
+            runCityMenu("9\nEastern Africa\n0\n", connection);
+
+            cityReports.verify(
+                    () -> CityReport.showCitiesByRegion(
+                            connection, "Eastern Africa"));
+        }
+    }
+
+    @Test
+    void testCitiesByCountry() throws Exception {
+        Connection connection = mock(Connection.class);
+
+        try (MockedStatic<CityReport> cityReports =
+                     mockStatic(CityReport.class)) {
+
+            runCityMenu("10\nJapan\n0\n", connection);
+
+            cityReports.verify(
+                    () -> CityReport.showCitiesByCountry(
+                            connection, "Japan"));
+        }
+    }
+
+    @Test
+    void testCitiesByDistrict() throws Exception {
+        Connection connection = mock(Connection.class);
+
+        try (MockedStatic<CityReport> cityReports =
+                     mockStatic(CityReport.class)) {
+
+            runCityMenu("11\nEngland\n0\n", connection);
+
+            cityReports.verify(
+                    () -> CityReport.showCitiesByDistrict(
+                            connection, "England"));
+        }
+    }
+
+    @Test
+    void testTopNCitiesWorldwide() throws Exception {
+        Connection connection = mock(Connection.class);
+
+        try (MockedStatic<CityReport> cityReports =
+                     mockStatic(CityReport.class)) {
+
+            runCityMenu("12\n5\n0\n", connection);
+
+            cityReports.verify(
+                    () -> CityReport.showTopNCitiesWorldwide(
+                            connection, 5));
+        }
+    }
+
+    @Test
+    void testTopNCitiesByContinent() throws Exception {
+        Connection connection = mock(Connection.class);
+
+        try (MockedStatic<CityReport> cityReports =
+                     mockStatic(CityReport.class)) {
+
+            runCityMenu("13\nEurope\n3\n0\n", connection);
+
+            cityReports.verify(
+                    () -> CityReport.showTopNCitiesByContinent(
+                            connection, "Europe", 3));
+        }
+    }
+
+    @Test
+    void testTopNCitiesByRegion() throws Exception {
+        Connection connection = mock(Connection.class);
+
+        try (MockedStatic<CityReport> cityReports =
+                     mockStatic(CityReport.class)) {
+
+            runCityMenu("14\nWestern Europe\n4\n0\n", connection);
+
+            cityReports.verify(
+                    () -> CityReport.showTopNCitiesByRegion(
+                            connection, "Western Europe", 4));
+        }
+    }
+
+    @Test
+    void testTopNCitiesByCountry() throws Exception {
+        Connection connection = mock(Connection.class);
+
+        try (MockedStatic<CityReport> cityReports =
+                     mockStatic(CityReport.class)) {
+
+            runCityMenu("15\nJapan\n2\n0\n", connection);
+
+            cityReports.verify(
+                    () -> CityReport.showTopNCitiesByCountry(
+                            connection, "Japan", 2));
+        }
+    }
+
+    @Test
+    void testTopNCitiesByDistrict() throws Exception {
+        Connection connection = mock(Connection.class);
+
+        try (MockedStatic<CityReport> cityReports =
+                     mockStatic(CityReport.class)) {
+
+            runCityMenu("16\nEngland\n3\n0\n", connection);
+
+            cityReports.verify(
+                    () -> CityReport.showTopNCitiesByDistrict(
+                            connection, "England", 3));
+        }
     }
 }

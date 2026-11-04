@@ -43,11 +43,7 @@ public class Main {
             CapitalCityReports capitalReports =
                     new CapitalCityReports(connection);
 
-            ConsoleMenu menu = new ConsoleMenu(
-                    capitalReports,
-                    System.in,
-                    System.out
-            );
+            ConsoleMenu menu = new ConsoleMenu(capitalReports, connection, System.in, System.out);
 
             menu.run();
 
