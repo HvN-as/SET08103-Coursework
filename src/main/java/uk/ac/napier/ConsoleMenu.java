@@ -40,9 +40,9 @@ public class ConsoleMenu {
             output.println("1. All capital cities worldwide");
             output.println("2. Capital cities by continent");
             output.println("3. Capital cities by region");
-            output.println("4. Top N capital cities worldwide");
-            output.println("5. Top N capital cities by continent");
-            output.println("6. Top N capital cities by region");
+            output.println("4. Top capital cities worldwide");
+            output.println("5. Top capital cities by continent");
+            output.println("6. Top capital cities by region");
 
             output.println("\n--- City Population Reports ---");
             output.println("7. All cities worldwide");
@@ -50,11 +50,11 @@ public class ConsoleMenu {
             output.println("9. Cities by region");
             output.println("10. Cities by country");
             output.println("11. Cities by district");
-            output.println("12. Top N cities worldwide");
-            output.println("13. Top N cities by continent");
-            output.println("14. Top N cities by region");
-            output.println("15. Top N cities by country");
-            output.println("16. Top N cities by district");
+            output.println("12. Top cities worldwide");
+            output.println("13. Top cities by continent");
+            output.println("14. Top cities by region");
+            output.println("15. Top cities by country");
+            output.println("16. Top cities by district");
 
             output.println("\n0. Exit");
             output.print("Select an option: ");
@@ -204,7 +204,7 @@ public class ConsoleMenu {
     }
 
     private int readPositiveNumber() {
-        output.print("Enter Top N: ");
+        output.print("Enter number of cities: ");
 
         if (!scanner.hasNextLine()) {
             throw new IllegalArgumentException(
@@ -218,7 +218,7 @@ public class ConsoleMenu {
 
             if (number <= 0) {
                 throw new IllegalArgumentException(
-                        "Top N must be greater than zero.");
+                        "Number must be greater than zero.");
             }
 
             return number;
