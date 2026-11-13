@@ -9,33 +9,40 @@ import java.util.Scanner;
 
 public class ConsoleMenu {
 
+    // Store the report classes, database connection and input/output
     private final CapitalCityReports capitalReports;
     private final Connection connection;
     private final Scanner scanner;
     private final PrintStream output;
 
-    // Preserve the existing constructor for capital-report tests.
+    // Constructor used by the existing capital city report tests
     public ConsoleMenu(CapitalCityReports capitalReports,
                        InputStream input,
                        PrintStream output) {
         this(capitalReports, null, input, output);
     }
 
-    // Constructor supporting both capital and city reports.
+    // Constructor used by the main application
     public ConsoleMenu(CapitalCityReports capitalReports,
                        Connection connection,
                        InputStream input,
                        PrintStream output) {
+
         this.capitalReports = capitalReports;
         this.connection = connection;
         this.scanner = new Scanner(input);
         this.output = output;
     }
 
+    // Display the menu and allow users to select reports
     public void run() throws SQLException {
+
+        // Keep displaying the menu until the user chooses to exit
         while (true) {
+
             output.println("\n=== World Population Reports ===");
 
+            // Capital city report options
             output.println("\n--- Capital City Reports ---");
             output.println("1. All capital cities worldwide");
             output.println("2. Capital cities by continent");
@@ -44,6 +51,7 @@ public class ConsoleMenu {
             output.println("5. Top capital cities by continent");
             output.println("6. Top capital cities by region");
 
+            // City population report options
             output.println("\n--- City Population Reports ---");
             output.println("7. All cities worldwide");
             output.println("8. Cities by continent");
@@ -56,50 +64,76 @@ public class ConsoleMenu {
             output.println("15. Top cities by country");
             output.println("16. Top cities by district");
 
+            // Country population report options
+            output.println("\n--- Country Population Reports ---");
+            output.println("17. All countries worldwide");
+            output.println("18. Countries by continent");
+            output.println("19. Countries by region");
+            output.println("20. Top countries worldwide");
+            output.println("21. Top countries by continent");
+            output.println("22. Top countries by region");
+
+            // Exit option
             output.println("\n0. Exit");
             output.print("Select an option: ");
 
+            // Check whether input is available
             if (!scanner.hasNextLine()) {
                 output.println("\nInput closed. Exiting.");
                 return;
             }
 
+            // Read the user's menu selection
             String choice = scanner.nextLine().trim();
 
+            // Exit when the user enters 0
             if (choice.equals("0")) {
                 output.println("Goodbye!");
                 return;
             }
 
             try {
+
+                // Run the report selected by the user
                 switch (choice) {
 
-                    // Capital reports: existing functionality
+                    // CAPITAL CITY REPORTS
+
+                    // Report 1: All capital cities worldwide
                     case "1" -> capitalReports.allCapitalsWorldwide();
 
+                    // Report 2: Capital cities in a continent
                     case "2" -> capitalReports.capitalsByContinent(
                             readRequiredText("Enter continent: "));
 
+                    // Report 3: Capital cities in a region
                     case "3" -> capitalReports.capitalsByRegion(
                             readRequiredText("Enter region: "));
 
+                    // Report 4: Top N capital cities worldwide
                     case "4" -> capitalReports.topCapitalsWorldwide(
-                            readPositiveNumber());
+                            readPositiveNumber("capitals"));
 
+                    // Report 5: Top N capitals in a continent
                     case "5" -> capitalReports.topCapitalsByContinent(
                             readRequiredText("Enter continent: "),
-                            readPositiveNumber());
+                            readPositiveNumber("capitals"));
 
+                    // Report 6: Top N capitals in a region
                     case "6" -> capitalReports.topCapitalsByRegion(
                             readRequiredText("Enter region: "),
-                            readPositiveNumber());
+                            readPositiveNumber("capitals"));
 
-                    // City population reports
+
+                    // CITY POPULATION REPORTS
+
+                    // Report 7: All cities worldwide
                     case "7" -> {
                         requireCityConnection();
                         CityReport.showAllCities(connection);
                     }
 
+                    // Report 8: Cities in a continent
                     case "8" -> {
                         requireCityConnection();
                         CityReport.showCitiesByContinent(
@@ -107,6 +141,7 @@ public class ConsoleMenu {
                                 readRequiredText("Enter continent: "));
                     }
 
+                    // Report 9: Cities in a region
                     case "9" -> {
                         requireCityConnection();
                         CityReport.showCitiesByRegion(
@@ -114,6 +149,7 @@ public class ConsoleMenu {
                                 readRequiredText("Enter region: "));
                     }
 
+                    // Report 10: Cities in a country
                     case "10" -> {
                         requireCityConnection();
                         CityReport.showCitiesByCountry(
@@ -121,6 +157,7 @@ public class ConsoleMenu {
                                 readRequiredText("Enter country: "));
                     }
 
+                    // Report 11: Cities in a district
                     case "11" -> {
                         requireCityConnection();
                         CityReport.showCitiesByDistrict(
@@ -128,84 +165,133 @@ public class ConsoleMenu {
                                 readRequiredText("Enter district: "));
                     }
 
+                    // Report 12: Top N cities worldwide
                     case "12" -> {
                         requireCityConnection();
                         CityReport.showTopNCitiesWorldwide(
                                 connection,
-                                readPositiveNumber());
+                                readPositiveNumber("cities"));
                     }
 
+                    // Report 13: Top N cities in a continent
                     case "13" -> {
                         requireCityConnection();
                         CityReport.showTopNCitiesByContinent(
                                 connection,
                                 readRequiredText("Enter continent: "),
-                                readPositiveNumber());
+                                readPositiveNumber("cities"));
                     }
 
+                    // Report 14: Top N cities in a region
                     case "14" -> {
                         requireCityConnection();
                         CityReport.showTopNCitiesByRegion(
                                 connection,
                                 readRequiredText("Enter region: "),
-                                readPositiveNumber());
+                                readPositiveNumber("cities"));
                     }
 
+                    // Report 15: Top N cities in a country
                     case "15" -> {
                         requireCityConnection();
                         CityReport.showTopNCitiesByCountry(
                                 connection,
                                 readRequiredText("Enter country: "),
-                                readPositiveNumber());
+                                readPositiveNumber("cities"));
                     }
 
+                    // Report 16: Top N cities in a district
                     case "16" -> {
                         requireCityConnection();
                         CityReport.showTopNCitiesByDistrict(
                                 connection,
                                 readRequiredText("Enter district: "),
-                                readPositiveNumber());
+                                readPositiveNumber("cities"));
                     }
 
+
+                    // COUNTRY POPULATION REPORTS
+
+                    // Report 17: All countries worldwide
+                    case "17" -> CountryReport.displayCountries();
+
+                    // Report 18: Countries in a selected continent
+                    case "18" -> CountryReport.displayCountriesByContinent(
+                            readRequiredText("Enter continent: "));
+
+                    // Report 19: Countries in a selected region
+                    case "19" -> CountryReport.displayCountriesByRegion(
+                            readRequiredText("Enter region: "));
+
+                    // Report 20: Top N countries worldwide
+                    case "20" -> CountryReport.displayTopCountries(
+                            readPositiveNumber("countries"));
+
+                    // Report 21: Top N countries in a continent
+                    case "21" -> CountryReport.displayTopCountriesByContinent(
+                            readRequiredText("Enter continent: "),
+                            readPositiveNumber("countries"));
+
+                    // Report 22: Top N countries in a region
+                    case "22" -> CountryReport.displayTopCountriesByRegion(
+                            readRequiredText("Enter region: "),
+                            readPositiveNumber("countries"));
+
+                    // Handle an option that does not exist
                     default -> output.println(
                             "Invalid menu option. Please try again.");
                 }
 
             } catch (IllegalArgumentException |
                      IllegalStateException e) {
+
+                // Show an error without closing the menu
                 output.println("Invalid input: " + e.getMessage());
             }
         }
     }
 
+    // Check that a database connection is available for city reports
     private void requireCityConnection() {
+
         if (connection == null) {
             throw new IllegalStateException(
                     "City reports are not configured.");
         }
     }
 
+    // Read text such as a continent, region or country
     private String readRequiredText(String prompt) {
+
+        // Ask the user to enter a value
         output.print(prompt);
 
+        // Check that input is available
         if (!scanner.hasNextLine()) {
             throw new IllegalArgumentException(
                     "Input is required.");
         }
 
+        // Remove extra spaces before and after the input
         String value = scanner.nextLine().trim();
 
+        // Reject blank input
         if (value.isBlank()) {
             throw new IllegalArgumentException(
                     "Value cannot be blank.");
         }
 
+        // Return the text entered
         return value;
     }
 
-    private int readPositiveNumber() {
-        output.print("Enter number of cities: ");
+    // Read a positive number for a Top N report
+    private int readPositiveNumber(String reportType) {
 
+        // Ask for the number of countries, cities or capitals
+        output.print("Enter number of " + reportType + ": ");
+
+        // Check that input is available
         if (!scanner.hasNextLine()) {
             throw new IllegalArgumentException(
                     "A positive number is required.");
@@ -214,16 +300,22 @@ public class ConsoleMenu {
         String value = scanner.nextLine().trim();
 
         try {
+
+            // Convert the text into a whole number
             int number = Integer.parseInt(value);
 
+            // Reject zero or negative numbers
             if (number <= 0) {
                 throw new IllegalArgumentException(
                         "Number must be greater than zero.");
             }
 
+            // Return the valid number
             return number;
 
         } catch (NumberFormatException e) {
+
+            // Handle letters or other invalid input
             throw new IllegalArgumentException(
                     "Please enter a valid whole number.");
         }
