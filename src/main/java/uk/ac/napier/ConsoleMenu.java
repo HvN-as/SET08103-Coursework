@@ -73,6 +73,19 @@ public class ConsoleMenu {
             output.println("21. Top countries by continent");
             output.println("22. Top countries by region");
 
+            // Population total report options
+            output.println("\n--- Population Total Reports ---");
+            output.println("23. World population");
+            output.println("24. Population of a continent");
+            output.println("25. Population of a region");
+            output.println("26. Population of a country");
+            output.println("27. Population of a district");
+            output.println("28. Population of a city");
+
+            // Language population report option
+            output.println("\n--- Language Population Reports ---");
+            output.println("29. Major language population report");
+
             // Exit option
             output.println("\n0. Exit");
             output.print("Select an option: ");
@@ -237,6 +250,84 @@ public class ConsoleMenu {
                             readRequiredText("Enter region: "),
                             readPositiveNumber("countries"));
 
+
+                    // POPULATION TOTAL REPORTS
+
+                    // Report 23: World population
+                    case "23" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        output.println("World population: " +
+                                reports.worldPopulation());
+                    }
+
+                    // Report 24: Population of a continent
+                    case "24" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        String continent =
+                                readRequiredText("Enter continent: ");
+                        output.println("Population of " + continent + ": " +
+                                reports.continentPopulation(continent));
+                    }
+
+                    // Report 25: Population of a region
+                    case "25" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        String region =
+                                readRequiredText("Enter region: ");
+                        output.println("Population of " + region + ": " +
+                                reports.regionPopulation(region));
+                    }
+
+                    // Report 26: Population of a country
+                    case "26" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        String country =
+                                readRequiredText("Enter country: ");
+                        output.println("Population of " + country + ": " +
+                                reports.countryPopulation(country));
+                    }
+
+                    // Report 27: Population of a district
+                    case "27" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        String district =
+                                readRequiredText("Enter district: ");
+                        output.println("Population of " + district + ": " +
+                                reports.districtPopulation(district));
+                    }
+
+                    // Report 28: Population of a city
+                    case "28" -> {
+                        requireCityConnection();
+                        PopulationTotalReports reports =
+                                new PopulationTotalReports(connection);
+                        String city =
+                                readRequiredText("Enter city: ");
+                        output.println("Population of " + city + ": " +
+                                reports.cityPopulation(city));
+                    }
+
+
+                    // LANGUAGE POPULATION REPORT
+
+                    // Report 29: Major language population report
+                    case "29" -> {
+                        requireCityConnection();
+                        LanguagePopulationReports reports =
+                                new LanguagePopulationReports(connection);
+                        reports.showLanguageReport(output);
+                    }
+
                     // Handle an option that does not exist
                     default -> output.println(
                             "Invalid menu option. Please try again.");
@@ -251,7 +342,7 @@ public class ConsoleMenu {
         }
     }
 
-    // Check that a database connection is available for city reports
+    // Check that a database connection is available for reports
     private void requireCityConnection() {
 
         if (connection == null) {
