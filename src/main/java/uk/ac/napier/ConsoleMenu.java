@@ -86,6 +86,12 @@ public class ConsoleMenu {
             output.println("\n--- Language Population Reports ---");
             output.println("29. Major language population report");
 
+            // Population breakdown report options (TJ's Tasks)
+            output.println("\n--- Population Breakdown Reports ---");
+            output.println("30. Population breakdown by continent");
+            output.println("31. Population breakdown by region");
+            output.println("32. Population breakdown by country");
+
             // Exit option
             output.println("\n0. Exit");
             output.print("Select an option: ");
@@ -326,6 +332,33 @@ public class ConsoleMenu {
                         LanguagePopulationReports reports =
                                 new LanguagePopulationReports(connection);
                         reports.showLanguageReport(output);
+                    }
+
+
+                    // POPULATION BREAKDOWN REPORTS (TJ's Tasks)
+
+                    // Report 30: Population breakdown by continent
+                    case "30" -> {
+                        requireCityConnection();
+                        PopulationBreakdownReports reports =
+                                new PopulationBreakdownReports(connection);
+                        reports.displayContinentPopulationBreakdown();
+                    }
+
+                    // Report 31: Population breakdown by region
+                    case "31" -> {
+                        requireCityConnection();
+                        PopulationBreakdownReports reports =
+                                new PopulationBreakdownReports(connection);
+                        reports.displayRegionPopulationBreakdown();
+                    }
+
+                    // Report 32: Population breakdown by country
+                    case "32" -> {
+                        requireCityConnection();
+                        PopulationBreakdownReports reports =
+                                new PopulationBreakdownReports(connection);
+                        reports.displayCountryPopulationBreakdown();
                     }
 
                     // Handle an option that does not exist
