@@ -53,12 +53,29 @@ public class PopulationTotalReports {
                 required(district));
     }
 
-    public long cityPopulation(String city)
-            throws SQLException {
-        return queryTotal(
-                "SELECT COALESCE(SUM(Population), 0) " +
-                        "FROM city WHERE Name = ?",
-                required(city));
+    public long cityPopulation(String city) throws SQLException {
+        String cityName = required(city);
+
+        try (java.sql.PreparedStatement stmt = connection.prepareStatement(
+                "SELECT SUM(Population) FROM city WHERE Name = ?")) {
+
+            stmt.setString(1, cityName);
+
+            try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    long population = rs.getLong(1);
+
+                    if (rs.wasNull()) {
+                        throw new IllegalArgumentException(
+                                "City not found: " + cityName);
+                    }
+
+                    return population;
+                }
+            }
+        }
+
+        throw new IllegalArgumentException("City not found: " + cityName);
     }
 
     private static String required(String value) {

@@ -84,6 +84,30 @@ class PopulationTotalReportsTest {
     }
 
     @Test
+    void cityPopulationUnknownCity() throws Exception {
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ResultSet result = mock(ResultSet.class);
+
+        when(connection.prepareStatement(anyString()))
+                .thenReturn(statement);
+        when(statement.executeQuery()).thenReturn(result);
+        when(result.next()).thenReturn(true);
+        when(result.getLong(1)).thenReturn(0L);
+        when(result.wasNull()).thenReturn(true);
+
+        PopulationTotalReports reports =
+                new PopulationTotalReports(connection);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> reports.cityPopulation("Atlantis")
+        );
+
+        assertEquals("City not found: Atlantis", exception.getMessage());
+    }
+
+    @Test
     void rejectsNullConnection() {
         assertThrows(NullPointerException.class,
                 () -> new PopulationTotalReports(null));
