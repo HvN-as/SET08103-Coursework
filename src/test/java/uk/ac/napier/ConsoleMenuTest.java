@@ -350,4 +350,22 @@ class ConsoleMenuTest {
                             connection, "England", 3));
         }
     }
+    @Test
+    void testInvalidTopN() throws Exception {
+
+        // Simulate the user selecting option 4 (Top N capitals).
+        // The user then enters "abc" instead of a number.
+        // Finally, 0 is entered to exit the menu.
+        String result = runMenu("4\nabc\n0\n");
+
+        // Check that the program displays the correct error
+        // message when letters are entered instead of a number.
+        assertTrue(result.contains("Please enter a valid whole number"));
+
+        // Verify that no capital city report was executed
+        // because the user entered invalid input.
+        verifyNoInteractions(capitalReports);
+    }
+
+
 }
